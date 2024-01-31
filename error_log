@@ -1,0 +1,10 @@
+[30-Dec-2023 15:35:28 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:37:46 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:38:01 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:38:01 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:38:06 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:39:36 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:44:09 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 15:44:17 UTC] PHP Fatal error:  Cannot use isset() on the result of an expression (you can use "null !== expression" instead) in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 43
+[30-Dec-2023 16:11:03 UTC] PHP Fatal error:  Cannot use [] for reading in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 68
+[30-Dec-2023 16:11:58 UTC] PHP Fatal error:  Cannot use [] for reading in /home4/vitlone/public_html/test/be/application/controllers/Users.php on line 68
