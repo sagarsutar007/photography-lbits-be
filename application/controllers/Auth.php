@@ -1,6 +1,8 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-class Auth extends CI_Controller {
-    public function __construct() {
+class Auth extends CI_Controller
+{
+    public function __construct()
+    {
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: X-DEVICE-ID,X-TOKEN,X-DEVICE-TYPE, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -12,7 +14,8 @@ class Auth extends CI_Controller {
         $this->load->model('Auth_model', 'auth');
         $this->load->model('Users_model', 'user');
     }
-    public function index() {
+    public function index()
+    {
         $json = json_decode(file_get_contents('php://input'));
         $data = [];
         if ($json != null) {
@@ -31,14 +34,15 @@ class Auth extends CI_Controller {
                         $this->user->update($arr, $carr);
                         $data['user_code'] = "NEW";
 
-                        $key = "e2fezUjQdMCo6VZa";	
-						$mbl = "+91" . $phone;
-						$message_content=urlencode("Hello User, To update account you can use this one-time OTP: $otp ADCOLC");
-						$templateid = "1307170374449021046";
-						$senderid="ADCOLC";	$route= 1;
-						$url = "http://www.text2india.store/vb/apikey.php?apikey=$key&templateid=$templateid&senderid=$senderid&number=$mbl&message=$message_content";
-											
-						$output = file_get_contents($url);
+                        $key = "e2fezUjQdMCo6VZa";
+                        $mbl = "+91" . $phone;
+                        $message_content = urlencode("Hello User, To update account you can use this one-time OTP: $otp ADCOLC");
+                        $templateid = "1307170374449021046";
+                        $senderid = "ADCOLC";
+                        $route = 1;
+                        $url = "http://www.text2india.store/vb/apikey.php?apikey=$key&templateid=$templateid&senderid=$senderid&number=$mbl&message=$message_content";
+
+                        $output = file_get_contents($url);
                     } else {
                         $pin = $user['pin'];
                         $data['user_code'] = "EXISTING";
@@ -54,14 +58,15 @@ class Auth extends CI_Controller {
                     $data['user_code'] = "NEW";
                     $data['otp'] = $otp;
                     $data['user_id'] = $user_id;
-                    $key = "e2fezUjQdMCo6VZa";	
-						$mbl = "+91" . $phone;
-						$message_content=urlencode("Hello User, To update account you can use this one-time OTP: $otp ADCOLC");
-						$templateid = "1307170374449021046";
-						$senderid="ADCOLC";	$route= 1;
-						$url = "http://www.text2india.store/vb/apikey.php?apikey=$key&templateid=$templateid&senderid=$senderid&number=$mbl&message=$message_content";
-											
-						$output = file_get_contents($url);
+                    $key = "e2fezUjQdMCo6VZa";
+                    $mbl = "+91" . $phone;
+                    $message_content = urlencode("Hello User, To update account you can use this one-time OTP: $otp ADCOLC");
+                    $templateid = "1307170374449021046";
+                    $senderid = "ADCOLC";
+                    $route = 1;
+                    $url = "http://www.text2india.store/vb/apikey.php?apikey=$key&templateid=$templateid&senderid=$senderid&number=$mbl&message=$message_content";
+
+                    $output = file_get_contents($url);
                 }
             } else {
                 $data['status'] = "SUCCESS";
@@ -74,7 +79,43 @@ class Auth extends CI_Controller {
         }
         echo json_encode($data);
     }
-    public function getUserLoggedin($value = '') {
+
+    public function userExistance()
+    {
+        $json = json_decode(file_get_contents('php://input'));
+        $data = [];
+        if ($json != null) {
+            $phone = $json->phone;
+            if (!empty($phone)) {
+                $user = $this->user->searchByPhone($phone);
+
+                if ($user) {
+                    $pin = "";
+                    $data['status'] = "SUCCESS";
+                    $data['message'] = "Phone number found!";
+                    $pin = $user['pin'];
+                    $data['user_code'] = "EXISTING";
+                    $data['user'] = $user;
+                    $data['otp'] = $pin;
+                    $data['user_id'] = $user['id'];
+                } else {
+                    $data['status'] = "SUCCESS";
+                    $data['message'] = "Phone number not found!";
+                }
+            } else {
+                $data['status'] = "SUCCESS";
+                $data['message'] = "Phone number is required!";
+            }
+        } else {
+            http_response_code(401);
+            $data['status'] = "SUCCESS";
+            $data['message'] = "Required parameter is missing!";
+        }
+        echo json_encode($data);
+    }
+
+    public function getUserLoggedin($value = '')
+    {
         $json = json_decode(file_get_contents('php://input'));
         if ($json != null && $json->enteredOtp && $json->userId) {
             $otp = $json->enteredOtp;
