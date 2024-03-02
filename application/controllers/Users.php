@@ -1,6 +1,7 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Users extends CI_Controller {
+class Users extends CI_Controller
+{
 
 	public function __construct()
 	{
@@ -8,7 +9,9 @@ class Users extends CI_Controller {
 		header("Access-Control-Allow-Headers: X-DEVICE-ID,X-TOKEN,X-DEVICE-TYPE, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
 		header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 		$method = $_SERVER['REQUEST_METHOD'];
-		if($method == "OPTIONS") { die(); }
+		if ($method == "OPTIONS") {
+			die();
+		}
 		parent::__construct();
 		$this->load->model('Users_model', 'user');
 		$this->load->model('Services_model', 'services');
@@ -18,7 +21,7 @@ class Users extends CI_Controller {
 	public function updateUser()
 	{
 		$json = json_decode(file_get_contents('php://input'));
-		if($json != null && $json->userid){
+		if ($json != null && $json->userid) {
 
 			$user_id = $json->userid;
 			$arr = [];
@@ -26,22 +29,21 @@ class Users extends CI_Controller {
 			if (isset($json->email)) $arr['email'] = $json->email;
 			if (isset($json->state)) $arr['state'] = $json->state;
 			if (isset($json->city)) $arr['city'] = $json->city;
-			if (isset($json->username)) 
-			{
+			if (isset($json->username)) {
 				$this->load->library('ciqrcode');
-				$arr['username'] = $json->username; 
-				$params['data'] = "https://vitl.one/".$arr['username'];
-                $params['level'] = 'H';
-                $params['size'] = 10;
-                $params['savename'] = FCPATH.'assets/qrcodes/'.$arr['username'].'.png';
-                $this->ciqrcode->generate($params);
-                $arr['qrcode'] = base_url('assets/qrcodes/'.$arr['username'].'.png');
+				$arr['username'] = $json->username;
+				$params['data'] = "https://chromagz/" . $arr['username'];
+				$params['level'] = 'H';
+				$params['size'] = 10;
+				$params['savename'] = FCPATH . 'assets/qrcodes/' . $arr['username'] . '.png';
+				$this->ciqrcode->generate($params);
+				$arr['qrcode'] = base_url('assets/qrcodes/' . $arr['username'] . '.png');
 			}
 			if (isset($json->qualification)) $arr['qualification'] = $json->qualification;
 			if (isset($json->pin)) $arr['pin'] = $json->pin;
 			if (isset($json->phone)) $arr['phone'] = $json->phone;
 			if (isset($json->telephone)) $arr['telephone'] = $json->telephone;
-			
+
 			if (isset($json->maps)) $arr['maps'] = $json->maps;
 			if (isset($json->calendly)) $arr['calendly'] = $json->calendly;
 			if (isset($json->youtube)) $arr['youtube'] = $json->youtube;
@@ -57,40 +59,39 @@ class Users extends CI_Controller {
 
 			if ($user_updated) {
 				$data['status'] = "SUCCESS";
-				$data['message'] = "User updated successfully!";				
-				$data['user'] = $this->user->get($user_id);
-			} else {
-				$data['status'] = "ERROR";
-				$data['message'] = "User not updated!";
-				$data['user'] = $this->user->get($user_id);
-			}			
-		} else if ($this->input->method() == "post") {
-			$post = $this->input->post();
-			$user_id = $post['userid'];
-			if (!empty($_FILES['resume']['name'])) {
-	            $config['upload_path'] = './assets/uploads/';
-	            $config['allowed_types'] = 'docx|pdf|doc';
-	            $config['encrypt_name'] = TRUE;
-	            $config['max_size'] = 20480;
-	            $this->load->library('upload', $config);
-	            $user_updated = false;
-	            if ($this->upload->do_upload('resume')) {
-	                $file = $this->upload->data();
-	                $arr['resume'] = $file['file_name'];
-	                $user_updated = $this->user->updateUser($arr, $user_id);
-	            }
-	            
-	        }
-	        if ($user_updated) {
-				$data['status'] = "SUCCESS";
-				$data['message'] = "User updated successfully!";				
+				$data['message'] = "User updated successfully!";
 				$data['user'] = $this->user->get($user_id);
 			} else {
 				$data['status'] = "ERROR";
 				$data['message'] = "User not updated!";
 				$data['user'] = $this->user->get($user_id);
 			}
-		} else{
+		} else if ($this->input->method() == "post") {
+			$post = $this->input->post();
+			$user_id = $post['userid'];
+			if (!empty($_FILES['resume']['name'])) {
+				$config['upload_path'] = './assets/uploads/';
+				$config['allowed_types'] = 'docx|pdf|doc';
+				$config['encrypt_name'] = TRUE;
+				$config['max_size'] = 20480;
+				$this->load->library('upload', $config);
+				$user_updated = false;
+				if ($this->upload->do_upload('resume')) {
+					$file = $this->upload->data();
+					$arr['resume'] = $file['file_name'];
+					$user_updated = $this->user->updateUser($arr, $user_id);
+				}
+			}
+			if ($user_updated) {
+				$data['status'] = "SUCCESS";
+				$data['message'] = "User updated successfully!";
+				$data['user'] = $this->user->get($user_id);
+			} else {
+				$data['status'] = "ERROR";
+				$data['message'] = "User not updated!";
+				$data['user'] = $this->user->get($user_id);
+			}
+		} else {
 			http_response_code(401);
 			$data['status'] = "ERROR";
 			$data['message'] = "Required parameter is missing!";
@@ -98,24 +99,24 @@ class Users extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function checkUserName($value='')
+	public function checkUserName($value = '')
 	{
 		$json = json_decode(file_get_contents('php://input'));
-		if($json != null && $json->username){
+		if ($json != null && $json->username) {
 
 			$username = $json->username;
 			$username_status = $this->user->isUsernameAvailable($username);
 
 			if ($username_status) {
 				$data['status'] = "ERROR";
-				$data['message'] = "Username not available!";				
-				$data['available'] = false;				
+				$data['message'] = "Username not available!";
+				$data['available'] = false;
 			} else {
 				$data['status'] = "SUCCESS";
 				$data['message'] = "Username available!";
-				$data['available'] = true;				
-			}			
-		} else{
+				$data['available'] = true;
+			}
+		} else {
 			http_response_code(401);
 			$data['status'] = "ERROR";
 			$data['message'] = "Required parameter is missing!";
@@ -123,10 +124,10 @@ class Users extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function fetchUser($value='')
+	public function fetchUser($value = '')
 	{
 		$json = json_decode(file_get_contents('php://input'));
-		if($json != null && (isset($json->userid) || isset($json->username))){
+		if ($json != null && (isset($json->userid) || isset($json->username))) {
 			$user = $this->user->getUser($json);
 
 			if ($user) {
@@ -137,16 +138,16 @@ class Users extends CI_Controller {
 				}
 				$user['services'] = $this->services->countServices($user['id']);
 				$user['abstracts'] = $this->abstracts->countAbstracts($user['id']);
-			
+
 				$data['status'] = "SUCCESS";
-				$data['message'] = "User found!";				
-				$data['user'] = $user;				
+				$data['message'] = "User found!";
+				$data['user'] = $user;
 			} else {
 				$data['status'] = "ERROR";
 				$data['message'] = "User not found!";
-				$data['user'] = $user;			
-			}			
-		} else{
+				$data['user'] = $user;
+			}
+		} else {
 			http_response_code(401);
 			$data['status'] = "ERROR";
 			$data['message'] = "Required parameter is missing!";
@@ -156,60 +157,63 @@ class Users extends CI_Controller {
 
 	public function updateProfile()
 	{
-		if($_SERVER['REQUEST_METHOD'] == 'POST'){
+		if ($this->input->method() === 'post') {
 			$post = $this->input->post();
 			if (isset($_FILES['profile_img'])) {
-	            $config['upload_path'] = './assets/images/';
-	            $config['allowed_types'] = 'jpg|jpeg|png';
-	            $config['encrypt_name'] = TRUE;
-	            $config['max_size'] = 20480;
-	            $this->load->library('upload', $config);
-	            if ($this->upload->do_upload('profile_img')) {
-	                $file = $this->upload->data();
-	                $post['profile_img'] = $file['file_name'];
-	            } 
-	        }
+				$config['upload_path'] = './assets/images/';
+				$config['allowed_types'] = 'jpg|jpeg|png';
+				$config['encrypt_name'] = TRUE;
+				$config['max_size'] = 20480;
+				$this->load->library('upload', $config);
+				if ($this->upload->do_upload('profile_img')) {
+					$file = $this->upload->data();
+					$post['profile_img'] = $file['file_name'];
+				}
+			}
 
-	        $this->user->update($post, ['id'=>$post['id']]);
+			$this->user->update($post, ['id' => $post['id']]);
 			$data['status'] = "SUCCESS";
 			$data['message'] = "Data saved successfully!";
-
 		} else {
 			http_response_code(401);
 			$data['status'] = "ERROR";
 			$data['message'] = "Please check request format!";
 		}
-		echo json_encode($data);
+		$this->output->set_content_type('application/json')->set_output(json_encode($data));
 	}
+	// echo json_encode($data);
 
-	public function updatePin($value='')
+
+
+	public function updatePin()
 	{
 		$json = json_decode(file_get_contents('php://input'));
-		if($json != null && $json->userid && $json->oldPin && $json->newPin ){
+		if ($json != null && $json->userid && isset($json->userid, $json->oldPin, $json->newPin)) {
 			$user = $this->user->get($json->userid);
 
-			if ($user ) {
-				if (isset($json->oldPin) && ($json->oldPin == $user->pin)) {
+			if ($user) {
+				if (isset($user['pin']) && $json->oldPin == $user['pin']) {
 					$arr = ["pin" => $json->newPin];
-					$cond = ["id" => $json->userid];
-					$this->user->update($arr, $cond);
+					$cond = $json->userid;
+					$this->user->updateUser($arr, $cond);
+					$data['status'] = "SUCCESS";
+					$data['message'] = "User pin updated!";
+				} else {
+
+					$data['status'] = "ERROR";
+					$data['message'] = "User pin not updated!";
 				}
-				
-				$data['status'] = "SUCCESS";
-				$data['message'] = "User pin updated!";			
 			} else {
 				$data['status'] = "ERROR";
-				$data['message'] = "User not found!";		
-			}			
-		} else{
+				$data['message'] = "User not found!";
+			}
+		} else {
 			http_response_code(401);
 			$data['status'] = "ERROR";
 			$data['message'] = "Required parameter is missing!";
 		}
 		echo json_encode($data);
 	}
-
 }
-
 /* End of file  */
 /* Location: ./application/controllers/ */
