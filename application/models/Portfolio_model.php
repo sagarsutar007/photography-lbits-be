@@ -16,11 +16,17 @@ class Portfolio_model extends CI_Model
             'location' => $data['location'],
             'eventdate' => $data['eventdate'],
             'eventdescription' => $data['eventdescription'],
-            'Youtube_urls' => isset($data['YoutubeUrls']) ? $data['YoutubeUrls'] : null,
+            // 'Youtube_urls' => $data['youtubeUrls'],
+            // 'Youtube_urls' => isset($data['youtubeUrls']) ? $data['youtubeUrls'] : null,
             'user_id' => $data['userid']
         ];
+        // Check if YouTube URL is provided before including it
+        if (isset($data['YoutubeURLs'])) {
+            $arr['Youtube_urls'] = $data['YoutubeURLs'];
+        }
 
         $this->db->insert('portfolio_tbl', $arr);
+
         return $this->db->insert_id();
     }
 

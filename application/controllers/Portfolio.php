@@ -230,7 +230,8 @@ class Portfolio extends CI_Controller
 
             $post = $this->input->post();
 
-            return $this->portfolio->insert($post);
+
+            // return $this->portfolio->insert($post);
 
             $last_id = $this->portfolio->insert($post);
             $json = json_decode(file_get_contents('php://input'));
