@@ -11,20 +11,44 @@ class Customer_model extends CI_Model
     public function insert($data = '')
     {
         $arr = [
-            'event' => $data['event'],
-            'location' => $data['location'],
-            'eventdate' => $data['eventdate'],
-            'eventdescription' => $data['eventdescription'],
-            'Youtube_urls' => isset($data['YoutubeUrls']) ? $data['YoutubeUrls'] : null,
+            'groomName' => $data['groomName'],
+            'brideName' => $data['brideName'],
+            'weddingDate' => $data['weddingDate'],
+            'weddingTime' => $data['weddingTime'],
+            'weddingLocation' => $data['weddingLocation'],
+            'GroomMakingDate' => $data['GroomMakingDate'],
+            'GroomMakingTime' => $data['GroomMakingTime'],
+            'GroomMakingLocation' => $data['GroomMakingLocation'],
+            'GroomHaldiDate' => $data['GroomHaldiDate'],
+            'GroomHaldiTime' => $data['GroomHaldiTime'],
+            'GroomHaldiLocation' => $data['GroomHaldiLocation'],
+            'BrideHaldiDate' => $data['BrideHaldiDate'],
+            'BrideHaldiTime' => $data['BrideHaldiTime'],
+            'BrideHaldiLocation' => $data['BrideHaldiLocation'],
+            'MehandiDate' => $data['MehandiDate'],
+            'MehandiTime' => $data['MehandiTime'],
+            'MehandiLocation' => $data['MehandiLocation'],
+            'BrideMakingDate' => $data['BrideMakingDate'],
+            'BrideMakingTime' => $data['BrideMakingTime'],
+            'BrideMakingLocation' => $data['BrideMakingLocation'],
+            'ReceptionDate' => $data['ReceptionDate'],
+            'ReceptionTime' => $data['ReceptionTime'],
+            'ReceptionLocation' => $data['ReceptionLocation'],
             'user_id' => $data['userid']
+            // 'event' => $data['event'],
+            // 'location' => $data['location'],
+            // 'eventdate' => $data['eventdate'],
+            // 'eventdescription' => $data['eventdescription'],
+            // 'Youtube_urls' => isset($data['YoutubeUrls']) ? $data['YoutubeUrls'] : null,
+            // 'user_id' => $data['userid']
         ];
 
         $this->db->insert('customer_tbl', $arr);
         return $this->db->insert_id();
     }
-    public function getCustomerById($eventId)
+    public function getCustomerByName($groomName, $brideName)
     {
-        $q = $this->db->get_where('customer_tbl', array('id' => $eventId));
+        $q = $this->db->get_where('customer_tbl', array('groomName' => $groomName, 'brideName' => $brideName));
         return $q->row_array();
     }
     public function getImage($eventId = '')

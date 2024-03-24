@@ -27,8 +27,51 @@ class Portfolio_model extends CI_Model
 
         $this->db->insert('portfolio_tbl', $arr);
 
+
         return $this->db->insert_id();
     }
+
+    // public function deleteImageById($id)
+    // {
+    //     $q = $this->db->delete('files_tbl', array('id' => $id));
+    //     return $q->row_array();
+    // }
+    // public function deleteImageById($id)
+    // {
+    //     $arr = [
+    //         // 'file_name' => $data['file_name'],
+    //         'type' => 'portfolio',
+    //         'rec_id' => $id['id'],
+    //         'file_type' => 'img',
+    //     ];
+
+    //     $this->db->delete('files_tbl', $arr);
+    //     return $this->db->delete_id();
+    // }
+    public function deleteImageById($id)
+    {
+        // Your logic to delete the image based on $id goes here
+        // Use $id to identify and delete the image from the 'files_tbl' table
+
+        // Example (you need to replace this with your actual database logic):
+        $this->db->where('id', $id);
+        $this->db->delete('files_tbl');
+
+        return $this->db->affected_rows() > 0;
+    }
+
+    // public function deleteImage($id, $imageindex)
+    // {
+    //     // Your logic to delete the image from the database goes here
+    //     // Use $portfolioId and $imageId to identify and delete the image
+
+    //     // Example: (you need to replace this with your actual database logic)
+    //     $this->db->where('files_tbl', $id);
+    //     // $this->db->where('index', $imageindex);
+    //     $this->db->delete('files_tbl', $imageindex);
+
+    //     return $this->db->affected_rows() > 0;
+    // }
 
     public function insertImages($data = '')
     {
@@ -42,20 +85,38 @@ class Portfolio_model extends CI_Model
         $this->db->insert('files_tbl', $arr);
         return $this->db->insert_id();
     }
+    // public function update($data = [], $cond = [])
+    // {
+    //     $this->db->update($this->users, $data, $cond);
+    //     return $this->db->affected_rows();
+    // }
     public function update($data = [], $cond = [])
     {
-        $this->db->update($this->users, $data, $cond);
+        $this->db->update('portfolio_tbl', $data, $cond);
         return $this->db->affected_rows();
     }
+    // public function updatePortfolio($data = [], $cond = [])
+    // {
+    //     $this->db->update('portfolio_tbl', $data, $cond);
+    //     return $this->db->affected_rows();
+    // }
 
-    public function updatePortfolio($data = [], $userid = '')
+    public function updatePortfolio($data = [], $id = '')
     {
-        if (isset($data['userid'])) {
-            $data['userid'] = strtolower($data['userid']);
-        }
-        $this->db->update($this->users, $data, ['id' => $userid]);
+        // if (isset($data['username'])) {
+        //     $data['username'] = strtolower($data['username']);
+        // }
+        $this->db->update($this->portfolio, $data, ['id' => $id]);
         return $this->db->affected_rows();
     }
+    // public function updatePortfolio($data = [], $userid = '')
+    // {
+    //     if (isset($data['userid'])) {
+    //         $data['userid'] = strtolower($data['userid']);
+    //     }
+    //     $this->db->update($this->users, $data, ['id' => $userid]);
+    //     return $this->db->affected_rows();
+    // }
     public function get($value = '')
     {
         $q = $this->db->get_where($this->users, ['id' => $value]);

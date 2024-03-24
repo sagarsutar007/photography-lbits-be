@@ -16,6 +16,7 @@ class Users extends CI_Controller
 		$this->load->model('Users_model', 'user');
 		$this->load->model('Services_model', 'services');
 		$this->load->model('Abstracts_model', 'abstracts');
+		$this->load->model('Portfolio_model', 'portfolio');
 	}
 
 	public function updateUser()
