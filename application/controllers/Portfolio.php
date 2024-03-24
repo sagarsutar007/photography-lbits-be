@@ -6,6 +6,8 @@ class Portfolio extends CI_Controller
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: X-DEVICE-ID,X-TOKEN,X-DEVICE-TYPE, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Max-Age: 3600");
         $method = $_SERVER['REQUEST_METHOD'];
         if ($method == "OPTIONS") {
             die();
@@ -17,7 +19,6 @@ class Portfolio extends CI_Controller
     }
 
 
-
     public function updatePortfolio()
     {
         $json = json_decode(file_get_contents('php://input'));
@@ -25,83 +26,12 @@ class Portfolio extends CI_Controller
 
             $id = $json->id;
             $arr = [];
-            if (isset($json->event)) $arr['event'] = $json->event;
+            // if (isset($json->event)) $arr['event'] = $json->event;
             if (isset($json->location)) $arr['location'] = $json->location;
-            if (isset($json->eventdate)) $arr['eventdate'] = $json->eventdate;
+            if (isset($json->state)) $arr['state'] = $json->state;
             if (isset($json->eventdescription)) $arr['eventdescription'] = $json->eventdescription;
-            if (isset($json->Youtube_urls)) $arr['Youtube_urls'] = $json->Youtube_urls;
-            if (isset($json->location)) $arr['location'] = $json->location;
-
             $portfolio_updated = $this->portfolio->updatePortfolio($arr, $id);
 
-            if ($portfolio_updated) {
-                $data['status'] = "SUCCESS";
-                $data['message'] = "Portfolio updated successfully!";
-                $data['portfolio'] = $this->portfolio->get($id);
-            } else {
-                $data['status'] = "ERROR";
-                $data['message'] = "Portfolio not updated!";
-                $data['portfolio'] = $this->portfolio->get($id);
-            }
-        } else if ($this->input->method() == "post") {
-            $post = $this->input->post();
-            $id = $post['id'];
-            if (!empty($_FILES['portfolio_img']['name'][0]) && $id) {
-                $config['upload_path'] = './assets/images/';
-
-                $config['allowed_types'] = 'jpg|jpeg|png';
-
-                $config['encrypt_name'] = TRUE;
-
-                $config['max_size'] = 20480;
-
-                $this->load->library('upload', $config);
-                $uploaded_files = [];
-                for ($i = 0; $i < count($_FILES['portfolio_img']['name']); $i++) {
-
-                    $_FILES['userfile']['name'] = $_FILES['portfolio_img']['name'][$i];
-
-                    $_FILES['userfile']['type'] = $_FILES['portfolio_img']['type'][$i];
-
-                    $_FILES['userfile']['tmp_name'] = $_FILES['portfolio_img']['tmp_name'][$i];
-
-                    $_FILES['userfile']['error'] = $_FILES['portfolio_img']['error'][$i];
-
-                    $_FILES['userfile']['size'] = $_FILES['portfolio_img']['size'][$i];
-
-
-
-                    if ($this->upload->do_upload('userfile')) {
-
-                        $file = $this->upload->data();
-
-                        $files['file_name'] = $file['file_name'];
-
-                        $files['id'] = $id;
-
-                        $files['type'] = 'portfolio';
-                        $uploaded_files[] = $files;
-                    }
-                }
-
-
-
-                if (count($uploaded_files) > 0) {
-
-                    foreach ($uploaded_files as $key) {
-
-                        $this->portfolio->insertImages($key);
-                    }
-                }
-
-                $this->load->library('upload', $config);
-                $portfolio_updated = false;
-                if ($this->upload->do_upload('userfile')) {
-                    $file = $this->upload->data();
-                    $arr['images'] = $file['file_name'];
-                    $portfolio_updated = $this->portfolio->updatePortfolio($arr, $id);
-                }
-            }
             if ($portfolio_updated) {
                 $data['status'] = "SUCCESS";
                 $data['message'] = "Portfolio updated successfully!";
@@ -118,6 +48,124 @@ class Portfolio extends CI_Controller
         }
         echo json_encode($data);
     }
+
+
+
+    // public function updatePortfolio()
+    // {
+
+    //     if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+
+
+    //         $put = $this->input->put();
+
+    //         if (isset($put['id'])) {
+
+    //             $put = $this->input->put();
+    //             $last_id = $this->portfolio->update($put);
+    //             log_message('error', 'Input Data: ' . print_r($put, true));
+
+    //             // $json = json_decode(file_get_contents('php://input'));
+    //             // $data['status'] = "SUCCESS";
+    //             // $data['message'] = "Portfolio updated successfully!";
+    //             // $data['body'] = $put;
+    //             // $data['id'] = $last_id;
+
+
+    //             if (!empty($_FILES['portfolio_img']['name'][0]) && $last_id) {
+
+    //                 $config['upload_path'] = './assets/images/';
+
+    //                 $config['allowed_types'] = 'jpg|jpeg|png';
+
+    //                 $config['encrypt_name'] = TRUE;
+
+    //                 $config['max_size'] = 20480;
+
+    //                 $this->load->library('upload', $config);
+
+
+
+    //                 $uploaded_files = [];
+
+
+
+    //                 for ($i = 0; $i < count($_FILES['portfolio_img']['name']); $i++) {
+
+    //                     $_FILES['userfile']['name'] = $_FILES['portfolio_img']['name'][$i];
+
+    //                     $_FILES['userfile']['type'] = $_FILES['portfolio_img']['type'][$i];
+
+    //                     $_FILES['userfile']['tmp_name'] = $_FILES['portfolio_img']['tmp_name'][$i];
+
+    //                     $_FILES['userfile']['error'] = $_FILES['portfolio_img']['error'][$i];
+
+    //                     $_FILES['userfile']['size'] = $_FILES['portfolio_img']['size'][$i];
+
+
+
+    //                     if ($this->upload->do_upload('userfile')) {
+
+    //                         $file = $this->upload->data();
+
+    //                         $files['file_name'] = $file['file_name'];
+
+    //                         $files['id'] = $last_id;
+
+    //                         $files['type'] = 'portfolio';
+    //                         $uploaded_files[] = $files;
+    //                     }
+    //                 }
+
+
+
+    //                 if (count($uploaded_files) > 0) {
+    //                     foreach ($uploaded_files as $key) {
+    //                         // Check if the 'rec_id' is available in the update data
+
+    //                         if (isset($put['rec_id'])) {
+    //                             // If 'rec_id' is available, update the existing file in the 'files' table
+    //                             $this->portfolio->updateImage($key);
+    //                         } else {
+    //                             // If 'rec_id' is not available, insert a new image in the 'files' table
+    //                             $this->portfolio->insertImages($key);
+    //                         }
+    //                     }
+    //                     // Debugging: Log success message
+    //                     log_message('error', 'Portfolio updated successfully!');
+    //                     $data['status'] = "SUCCESS";
+    //                     $data['message'] = "Portfolio updated successfully!";
+    //                 } else {
+    //                     // Debugging: Log message about missing images
+    //                     log_message('error', 'No images provided for update.');
+    //                     $data['status'] = "INFO";
+    //                     $data['message'] = "No images provided for update.";
+    //                 }
+    //             } else {
+    //                 http_response_code(400); // Bad Request
+    //                 log_message('error', 'Please provide a valid "id" in the update data!');
+    //                 $data['status'] = "ERROR";
+    //                 $data['message'] = "Please provide a valid 'id' in the update data!";
+    //             }
+    //         } else {
+    //             http_response_code(400); // Bad Request
+    //             log_message('error', 'Please use the "PUT" request method!');
+    //             $data['status'] = "ERROR";
+    //             $data['message'] = "Please use the 'PUT' request method!";
+    //         }
+    //     } else {
+    //         http_response_code(400); // Bad Request
+    //         log_message('error', 'Please check request format!');
+    //         $data['status'] = "ERROR";
+    //         $data['message'] = "Please check request format!";
+    //     }
+
+    //     // Debugging: Log the response data
+    //     log_message('error', 'Response Data: ' . print_r($data, true));
+
+    //     echo json_encode($data);
+    // }
+
     // public function fetchPortfolio($value = '')
     // {
     //     $json = json_decode(file_get_contents('php://input'));
@@ -149,6 +197,31 @@ class Portfolio extends CI_Controller
     //     echo json_encode($data);
     // }
 
+    public function deleteImageById()
+    {
+        $deleteid = $this->input->get('id');
+        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') {
+            if (!empty($deleteid)) {
+                $imageDeleted = $this->portfolio->deleteImageById($deleteid);
+
+                if ($imageDeleted) {
+                    $data['status'] = "SUCCESS";
+                    $data['message'] = "Image deleted successfully!";
+                } else {
+                    $data['status'] = "ERROR";
+                    $data['message'] = "Image not deleted!";
+                }
+            } else {
+                $data['status'] = 'ERROR';
+                $data['message'] = 'ID parameter is missing!';
+            }
+        } else {
+            $data['status'] = "ERROR";
+            $data['message'] = "Invalid request method!";
+        }
+
+        echo json_encode($data);
+    }
 
     public function getPortfolioById()
     {
@@ -176,6 +249,7 @@ class Portfolio extends CI_Controller
             $data['status'] = "ERROR";
             $data['message'] = "Required parameter is missing!";
         }
+
         echo json_encode($data);
     }
 
@@ -219,6 +293,7 @@ class Portfolio extends CI_Controller
         }
         echo json_encode($data);
     }
+
 
 
 

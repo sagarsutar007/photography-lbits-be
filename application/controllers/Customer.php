@@ -75,13 +75,17 @@ class Customer extends CI_Controller
     //         echo "Error: " . $e->getMessage();
     //     }
     // }
-    public function getCustomerById()
+    public function getCustomerByName()
     {
-        $eventId = $this->input->get('id');
-        if (!empty($eventId)) {
+        $groomName = $this->input->get('GroomName');
+        $brideName = $this->input->get('BrideName');
+
+        if (!empty($groomName) && !empty($brideName)) {
             // Fetch customer data based on $eventId
-            $result = $this->Customer_model->getCustomerById($eventId);
+            $result = $this->Customer_model->getCustomerByName($groomName, $brideName);
             if ($result) {
+                $eventId = $result['id'];
+
                 // Fetch images associated with the customer
                 $images = $this->Customer_model->getImage($eventId);
 
