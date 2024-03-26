@@ -46,7 +46,7 @@ class Users_model extends CI_Model
 		return $q->row_array();
 	}
 
-	public function getUser($data = '')
+	public function getUser($data)
 	{
 
 		if (isset($data->username) && !empty($data->username)) {

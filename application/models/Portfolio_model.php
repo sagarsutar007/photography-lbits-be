@@ -101,13 +101,30 @@ class Portfolio_model extends CI_Model
     //     return $this->db->affected_rows();
     // }
 
-    public function updatePortfolio($data = [], $id = '')
+    // public function portfolioUpdate($data, $id = '')
+    // {
+    //     print_r($data);
+
+
+    //     $this->db->update($this->portfolio, $data, ['id' => $id]);
+
+    //     return $this->db->affected_rows();
+    // }
+    public function portfolioUpdate($data, $id)
     {
-        // if (isset($data['username'])) {
-        //     $data['username'] = strtolower($data['username']);
-        // }
-        $this->db->update($this->portfolio, $data, ['id' => $id]);
-        return $this->db->affected_rows();
+        // print_r($data);
+        // print_r($id);
+
+        // Make sure $id is not empty
+        if (!empty($id)) {
+            $data['id'] = strtolower($data['id']);
+            $this->db->where('id', $id);
+            $this->db->update($this->portfolio, $data);
+            // $this->db->get_where('portfolio_tbl', array('id' => $id));
+            return $this->db->affected_rows();
+        } else {
+            return 0; // Or handle the case when $id is empty
+        }
     }
     // public function updatePortfolio($data = [], $userid = '')
     // {
