@@ -19,38 +19,55 @@ class Portfolio extends CI_Controller
     }
 
 
-    public function updatePortfolio()
-    {
-        $json = json_decode(file_get_contents('php://input'));
-        if ($json != null && $json->id) {
+    // public function updatePortfolio()
+    // {
+    // $json = json_decode(file_get_contents('php://input'));
+    //     // echo ($json);
+    //     // $json = json_decode(file_get_contents('php://input'));
+    //     // echo ("Testing");
+    //     // echo (file_get_contents('php://input'));
+    //     // $post = $this->input->post();
+    //     // echo ($post);
 
-            $id = $json->id;
-            $arr = [];
-            // if (isset($json->event)) $arr['event'] = $json->event;
-            if (isset($json->location)) $arr['location'] = $json->location;
-            if (isset($json->state)) $arr['state'] = $json->state;
-            if (isset($json->eventdescription)) $arr['eventdescription'] = $json->eventdescription;
-            $portfolio_updated = $this->portfolio->updatePortfolio($arr, $id);
+    //     // if ($json != null && $json->id) {
 
-            if ($portfolio_updated) {
-                $data['status'] = "SUCCESS";
-                $data['message'] = "Portfolio updated successfully!";
-                $data['portfolio'] = $this->portfolio->get($id);
-            } else {
-                $data['status'] = "ERROR";
-                $data['message'] = "Portfolio not updated!";
-                $data['portfolio'] = $this->portfolio->get($id);
-            }
-        } else {
-            http_response_code(401);
-            $data['status'] = "ERROR";
-            $data['message'] = "Required parameter is missing!";
-        }
-        echo json_encode($data);
-    }
+    //     //     $id = $json->id;
+    //     //     echo ($id);
+    //     //     $arr = [];
+    //     if ($json !== null) {
+    //         // Check if the 'id' parameter is present
+    //         if (isset($json->id)) {
+    //             // Extract data from the JSON object
+    //             $id = $json->id;
+    //             $arr = [];
+    //         if (isset($json->event)) $arr['event'] = $json->event;
+    //         if (isset($json->location)) $arr['location'] = $json->location;
+    //         if (isset($json->state)) $arr['state'] = $json->state;
+    //         if (isset($json->eventdescription)) $arr['eventdescription'] = $json->eventdescription;
+    //         $portfolio_updated = $this->portfolio->updatePortfolio($arr, $id);
 
-
-
+    //         if ($portfolio_updated) {
+    //             $data['status'] = "SUCCESS";
+    //             $data['message'] = "Portfolio updated successfully!";
+    //             $data['portfolio'] = $this->portfolio->get($id);
+    //         } else {
+    //             $data['status'] = "ERROR";
+    //             $data['message'] = "Portfolio not updated!";
+    //             $data['portfolio'] = $this->portfolio->get($id);
+    //         }
+    //     } else {
+    //         // 'id' parameter is missing
+    //         http_response_code(400); // Bad Request
+    //         $data['status'] = "ERROR";
+    //         $data['message'] = "Required parameter 'id' is missing!";
+    //     }
+    // } else {
+    //         http_response_code(401);
+    //         $data['status'] = "ERROR";
+    //         $data['message'] = "Required parameter is missing!";
+    //     }
+    //     echo json_encode($data);
+    // }
     // public function updatePortfolio()
     // {
 
@@ -386,13 +403,206 @@ class Portfolio extends CI_Controller
 
             $data['message'] = "Please check request format!";
         }
-
-
-
-
-
-
-
         echo json_encode($data);
     }
+    public function updatePortfolio()
+    {
+        if ($this->input->method() === 'post') {
+            $post = $this->input->post();
+            if (!empty($_FILES['portfolio_img']['name']) && $post['id']) {
+                // print_r($_FILES);
+
+                $config['upload_path'] = './assets/images/';
+
+                $config['allowed_types'] = 'jpg|jpeg|png';
+
+                $config['encrypt_name'] = TRUE;
+
+                $config['max_size'] = 20480;
+
+                $this->load->library('upload', $config);
+
+
+
+                $uploaded_files = [];
+                $existing_images = $this->portfolio->getImages($post['id']);
+                $existing_count = count($existing_images);
+
+
+
+                for ($i = $existing_count; $i < count($_FILES['portfolio_img']['name']) + $existing_count; $i++) {
+
+                    $_FILES['userfile']['name'] = $_FILES['portfolio_img']['name'][$i];
+
+                    $_FILES['userfile']['type'] = $_FILES['portfolio_img']['type'][$i];
+
+                    $_FILES['userfile']['tmp_name'] = $_FILES['portfolio_img']['tmp_name'][$i];
+
+                    $_FILES['userfile']['error'] = $_FILES['portfolio_img']['error'][$i];
+
+                    $_FILES['userfile']['size'] = $_FILES['portfolio_img']['size'][$i];
+
+
+
+                    if ($this->upload->do_upload('userfile')) {
+
+                        $file = $this->upload->data();
+
+                        $files['file_name'] = $file['file_name'];
+
+                        $files['id'] = $post['id'];
+
+                        $files['type'] = 'portfolio';
+                        $uploaded_files[] = $files;
+                    }
+                }
+
+
+
+                if (count($uploaded_files) > 0) {
+
+                    foreach ($uploaded_files as $key) {
+
+                        $this->portfolio->insertImages($key);
+                    }
+                }
+            } else {
+                // $_FILES['portfolio_img']['name'][0];
+                // print_r($_FILES['portfolio_img']);
+            }
+
+            $this->portfolio->portfolioUpdate($post,  $post['id']);
+
+            $data['status'] = "SUCCESS";
+            $data['message'] = "Data saved successfully!";
+        } else {
+            http_response_code(401);
+            $data['status'] = "ERROR";
+            $data['message'] = "Please check request format!";
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($data));
+    }
+    // public function updatePortfolio()
+    // {
+    //     if ($this->input->method() === 'post') {
+    //         $post = $this->input->post();
+    //         if (!empty($_FILES['portfolio_img']['name'][0]) && $post['id']) {
+    //             $config['upload_path'] = './assets/images/';
+    //             $config['allowed_types'] = 'jpg|jpeg|png';
+    //             $config['encrypt_name'] = TRUE;
+    //             $config['max_size'] = 20480;
+    //             $this->load->library('upload', $config);
+
+    //             $uploaded_files = [];
+
+    //             // Fetch existing images for the portfolio ID
+    // $existing_images = $this->portfolio->getImages($post['id']);
+    // $existing_count = count($existing_images);
+
+    //             for ($i = 0; $i < count($_FILES['portfolio_img']['name']); $i++) {
+    //                 $_FILES['userfile']['name'] = $_FILES['portfolio_img']['name'][$i];
+    //                 $_FILES['userfile']['type'] = $_FILES['portfolio_img']['type'][$i];
+    //                 $_FILES['userfile']['tmp_name'] = $_FILES['portfolio_img']['tmp_name'][$i];
+    //                 $_FILES['userfile']['error'] = $_FILES['portfolio_img']['error'][$i];
+    //                 $_FILES['userfile']['size'] = $_FILES['portfolio_img']['size'][$i];
+
+    //                 if ($this->upload->do_upload('userfile')) {
+    //                     $file = $this->upload->data();
+    //                     $files['file_name'] = $file['file_name'];
+    //                     $files['id'] = $post['id'];
+
+    //                     // Assigning another index for uploading image
+    //                     $files['type'] = 'portfolio_' . ($existing_count + $i + 1);
+    //                     $uploaded_files[] = $files;
+    //                 }
+    //             }
+
+    //             if (count($uploaded_files) > 0) {
+    //                 foreach ($uploaded_files as $key) {
+    //                     $this->portfolio->insertImages($key);
+    //                 }
+    //             }
+    //         } else {
+    //             // Handle case where no files are uploaded or no ID provided
+    //             // You might want to handle this case more explicitly
+    //         }
+
+    //         $this->portfolio->portfolioUpdate($post, $post['id']);
+    //         $data['status'] = "SUCCESS";
+    //         $data['message'] = "Data saved successfully!";
+    //     } else {
+    //         http_response_code(401);
+    //         $data['status'] = "ERROR";
+    //         $data['message'] = "Please check request format!";
+    //     }
+    //     $this->output->set_content_type('application/json')->set_output(json_encode($data));
+    // }
 }
+    // if (!empty($id)) {
+    //     $user_id = $json->userid;
+    //     $arr = [];
+    //     if (isset($json->event)) $arr['event'] = $json->event;
+    //     if (isset($json->location)) $arr['location'] = $json->location;
+    //     if (isset($json->state)) $arr['state'] = $json->state;
+    //     if (isset($json->eventdescription)) $arr['eventdescription'] = $json->eventdescription;
+    //     $portfolio_updated = $this->portfolio->updatePortfolio($arr, $id);
+
+    //     if ($portfolio_updated) {
+    //         $data['status'] = "SUCCESS";
+    //         $data['message'] = "Portfolio updated successfully!";
+    //         $data['portfolio'] = $this->portfolio->get($id);
+    //     } else {
+    //         $data['status'] = "ERROR";
+    //         $data['message'] = "Portfolio not updated!";
+    //         $data['portfolio'] = $this->portfolio->get($id);
+    //     }
+    // } else {
+    //     // 'id' parameter is missing
+    //     http_response_code(400); // Bad Request
+    //     $data['status'] = "ERROR";
+    //     $data['message'] = "Required parameter 'id' is missing!";
+    // }
+    // } else {
+
+    //     http_response_code(401);
+
+    //     $data['status'] = "ERROR";
+
+    //     $data['message'] = "Please check request format!";
+    // }
+    // echo json_encode($data);
+    // public function updatePortfolio()
+    // {
+    //     // Check if the request method is POST
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //         // Check if JSON data is present in the request body
+    //         $json = file_get_contents('php://input');
+    //         if ($json === false || empty($json)) {
+    //             // Output error message if JSON data is empty
+    //             echo "Error: Empty JSON data";
+    //             return;
+    //         }
+
+    //         // Attempt to decode JSON data
+    //         $decoded_json = json_decode($json);
+    //         if ($decoded_json === null) {
+    //             // Output error message if JSON decoding fails
+    //             echo "Error: Unable to decode JSON data";
+    //             return;
+    //         }
+
+    //         // Check if the 'id' property exists in the JSON object
+    //         if (!isset($decoded_json->id)) {
+    //             // Output error message if 'id' property is missing
+    //             echo "Error: 'id' property is missing in the JSON data";
+    //             return;
+    //         }
+
+    //         // Access the 'id' property
+    //         $id = $decoded_json->id;
+    //         echo $id; // For testing, remove this line after verifying
+    //     } else {
+    //         // Output error message for invalid request method
+    //         echo "Error: Invalid request method";
+    //     }
+    // }
